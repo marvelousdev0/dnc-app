@@ -1,0 +1,13 @@
+BASE_REF="${COMMITLINT_BASE_REF:-origin/main}"
+REQUIRE_STORY_ID=1
+
+if git rev-parse --verify "$BASE_REF" >/dev/null 2>&1; then
+	MERGE_BASE="$(git merge-base HEAD "$BASE_REF")"
+	COMMITS_AHEAD="$(git rev-list --count "$MERGE_BASE"..HEAD)"
+
+	if [ "$COMMITS_AHEAD" -gt 0 ]; then
+		REQUIRE_STORY_ID=0
+	fi
+fi
+
+REQUIRE_STORY_ID="$REQUIRE_STORY_ID" pnpm exec commitlint --edit "$1"
