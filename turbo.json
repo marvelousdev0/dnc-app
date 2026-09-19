@@ -1,0 +1,20 @@
+{
+	"$schema": "https://turbo.build/schema.json",
+	"globalEnv": ["REQUIRE_STORY_ID"],
+	"tasks": {
+		"app:build": {
+			"dependsOn": ["^app:build"],
+			"outputs": [".next/**", "!.next/cache/**"]
+		},
+		"app:dev": {
+			"cache": false,
+			"persistent": true
+		},
+		"app:lint": {
+			"outputs": []
+		},
+		"app:typecheck": {
+			"outputs": []
+		}
+	}
+}

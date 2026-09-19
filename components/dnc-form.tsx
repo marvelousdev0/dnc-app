@@ -120,13 +120,23 @@ export function DncForm({ mode, record }: DncFormProps) {
 		})
 	}
 
+	const labelClass = 'text-sm font-medium text-slate-300'
+
 	return (
-		<form className="panel form-panel" onSubmit={handleSubmit}>
-			<div className="field-grid">
-				<label className="field">
-					<span>Phone Number</span>
+		<form className="panel reveal reveal-delay-2" onSubmit={handleSubmit}>
+			<div className="mb-5 flex items-center justify-between border-b border-white/10 pb-4">
+				<p className="text-xs uppercase tracking-[0.22em] text-slate-300/75">Record profile</p>
+				<p className="rounded-full border border-cyan-300/30 bg-cyan-400/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-cyan-100">
+					{mode === 'create' ? 'Create mode' : 'Edit mode'}
+				</p>
+			</div>
+
+			<div className="grid gap-5 md:grid-cols-2">
+				<label className={labelClass}>
+					<span className="mb-2 block">Phone Number</span>
 					<input
 						type="tel"
+						className="field-input"
 						value={form.phoneNumber}
 						onChange={(event) => updateField('phoneNumber', event.target.value)}
 						required
@@ -134,14 +144,20 @@ export function DncForm({ mode, record }: DncFormProps) {
 					/>
 				</label>
 
-				<label className="field">
-					<span>Business Entity</span>
-					<input type="text" value={form.businessEntity} readOnly />
+				<label className={labelClass}>
+					<span className="mb-2 block">Business Entity</span>
+					<input
+						type="text"
+						className="field-input field-readonly"
+						value={form.businessEntity}
+						readOnly
+					/>
 				</label>
 
-				<label className="field">
-					<span>Business Unit</span>
+				<label className={labelClass}>
+					<span className="mb-2 block">Business Unit</span>
 					<select
+						className="field-input"
 						value={form.businessUnit}
 						onChange={(event) => updateField('businessUnit', event.target.value as DncBusinessUnit)}
 					>
@@ -153,9 +169,10 @@ export function DncForm({ mode, record }: DncFormProps) {
 					</select>
 				</label>
 
-				<label className="field">
-					<span>Business Segment</span>
+				<label className={labelClass}>
+					<span className="mb-2 block">Business Segment</span>
 					<select
+						className="field-input"
 						value={form.businessSegment}
 						onChange={(event) =>
 							updateField('businessSegment', event.target.value as DncRecord['businessSegment'])
@@ -169,9 +186,10 @@ export function DncForm({ mode, record }: DncFormProps) {
 					</select>
 				</label>
 
-				<label className="field">
-					<span>Channel</span>
+				<label className={labelClass}>
+					<span className="mb-2 block">Channel</span>
 					<select
+						className="field-input"
 						value={form.channel}
 						onChange={(event) => updateField('channel', event.target.value as DncRecord['channel'])}
 					>
@@ -183,9 +201,10 @@ export function DncForm({ mode, record }: DncFormProps) {
 					</select>
 				</label>
 
-				<label className="field">
-					<span>Intent</span>
+				<label className={labelClass}>
+					<span className="mb-2 block">Intent</span>
 					<select
+						className="field-input"
 						value={form.intent}
 						onChange={(event) => updateField('intent', event.target.value as DncRecord['intent'])}
 					>
@@ -197,9 +216,10 @@ export function DncForm({ mode, record }: DncFormProps) {
 					</select>
 				</label>
 
-				<label className="field">
-					<span>Status</span>
+				<label className={labelClass}>
+					<span className="mb-2 block">Status</span>
 					<select
+						className="field-input"
 						value={form.status}
 						onChange={(event) => updateField('status', event.target.value as DncRecord['status'])}
 					>
@@ -209,37 +229,65 @@ export function DncForm({ mode, record }: DncFormProps) {
 					</select>
 				</label>
 
-				<label className="field">
-					<span>Created Date</span>
-					<input type="text" value={new Date(form.createdDate).toLocaleString()} readOnly />
+				<label className={labelClass}>
+					<span className="mb-2 block">Created Date</span>
+					<input
+						type="text"
+						className="field-input field-readonly"
+						value={new Date(form.createdDate).toLocaleString()}
+						readOnly
+					/>
 				</label>
 
-				<label className="field">
-					<span>Created By</span>
-					<input type="text" value={form.createdBy || sessionUser.id} readOnly />
+				<label className={labelClass}>
+					<span className="mb-2 block">Created By</span>
+					<input
+						type="text"
+						className="field-input field-readonly"
+						value={form.createdBy || sessionUser.id}
+						readOnly
+					/>
 				</label>
 
-				<label className="field">
-					<span>Modified Date</span>
-					<input type="text" value={new Date(form.modifiedDate).toLocaleString()} readOnly />
+				<label className={labelClass}>
+					<span className="mb-2 block">Modified Date</span>
+					<input
+						type="text"
+						className="field-input field-readonly"
+						value={new Date(form.modifiedDate).toLocaleString()}
+						readOnly
+					/>
 				</label>
 
-				<label className="field">
-					<span>Modified By</span>
-					<input type="text" value={form.modifiedBy || sessionUser.id} readOnly />
+				<label className={labelClass}>
+					<span className="mb-2 block">Modified By</span>
+					<input
+						type="text"
+						className="field-input field-readonly"
+						value={form.modifiedBy || sessionUser.id}
+						readOnly
+					/>
 				</label>
 			</div>
 
-			{error ? <p className="form-message error">{error}</p> : null}
-			{message ? <p className="form-message success">{message}</p> : null}
+			{error ? (
+				<p className="mt-5 rounded-xl border border-rose-300/35 bg-rose-500/12 px-4 py-3 text-sm font-semibold text-rose-100">
+					{error}
+				</p>
+			) : null}
+			{message ? (
+				<p className="mt-5 rounded-xl border border-emerald-300/35 bg-emerald-500/12 px-4 py-3 text-sm font-semibold text-emerald-100">
+					{message}
+				</p>
+			) : null}
 
-			<div className="button-row">
-				<button type="submit" className="button primary">
+			<div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+				<button type="submit" className="btn-primary hover-lift">
 					{mode === 'create' ? 'Create DNC Record' : 'Save Changes'}
 				</button>
 				<button
 					type="button"
-					className="button secondary"
+					className="btn-secondary hover-lift"
 					onClick={() => router.push('/internal-dnc')}
 				>
 					Cancel
