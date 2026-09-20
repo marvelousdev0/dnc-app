@@ -1,0 +1,28 @@
+.input {
+	min-height: 2.75rem;
+	width: 100%;
+	border-radius: 0.75rem;
+	border: 1px solid var(--field-border);
+	background: var(--field-bg);
+	padding: 0.5rem 1rem;
+	color: var(--field-text);
+	outline: none;
+	transition:
+		border-color 180ms ease,
+		box-shadow 180ms ease;
+}
+
+.input::placeholder {
+	color: var(--field-placeholder);
+}
+
+.input:focus {
+	border-color: var(--field-focus-border);
+	box-shadow: 0 0 0 2px var(--field-focus-ring);
+}
+
+.input:read-only {
+	border-color: var(--field-readonly-border);
+	background: var(--field-readonly-bg);
+	color: var(--field-readonly-text);
+}

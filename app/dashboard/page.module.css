@@ -1,0 +1,145 @@
+.orbLeft {
+	left: -5rem;
+	top: 1.25rem;
+	height: 18rem;
+	width: 18rem;
+	background: rgb(74 222 128 / 0.28);
+}
+
+.orbRight {
+	right: -3rem;
+	top: 6rem;
+	height: 18rem;
+	width: 18rem;
+	background: rgb(34 211 238 / 0.22);
+}
+
+.header {
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+}
+
+.title {
+	font-family: var(--font-syne), sans-serif;
+	font-size: clamp(1.875rem, 4vw, 3rem);
+	line-height: 1.04;
+	letter-spacing: -0.02em;
+	margin: 0;
+	color: color-mix(in srgb, var(--text-main) 96%, transparent);
+}
+
+.subtitle {
+	margin-top: 0.75rem;
+	max-width: 42rem;
+	font-size: 0.95rem;
+	color: color-mix(in srgb, var(--text-main) 76%, transparent);
+}
+
+.metrics {
+	margin-bottom: 1.75rem;
+	display: grid;
+	gap: 1rem;
+}
+
+.metricHighlight {
+	border-color: rgb(167 243 208 / 0.24);
+	background: linear-gradient(140deg, rgb(74 222 128 / 0.15), rgb(34 197 94 / 0.05));
+}
+
+.metricLabel {
+	font-size: 0.72rem;
+	text-transform: uppercase;
+	letter-spacing: 0.2em;
+	color: color-mix(in srgb, var(--text-main) 70%, transparent);
+}
+
+.metricValue {
+	display: block;
+	margin-top: 0.75rem;
+	font-size: 2.25rem;
+	font-weight: 650;
+	color: color-mix(in srgb, var(--text-main) 94%, transparent);
+}
+
+.cards {
+	display: grid;
+	gap: 1rem;
+}
+
+.card {
+	border-radius: 1.5rem;
+	border: 1px solid color-mix(in srgb, var(--text-main) 18%, transparent);
+	background: color-mix(in srgb, var(--text-main) 6%, transparent);
+	padding: 1.25rem;
+	transition:
+		border-color 220ms ease,
+		background 220ms ease,
+		transform 220ms ease;
+}
+
+.card:hover {
+	border-color: color-mix(in srgb, var(--color-info) 42%, transparent);
+	background: color-mix(in srgb, var(--color-info-bg) 68%, transparent);
+	transform: translateY(-2px);
+}
+
+.cardIcon {
+	margin-bottom: 1.2rem;
+	display: inline-flex;
+	height: 2.5rem;
+	width: 2.5rem;
+	align-items: center;
+	justify-content: center;
+	border-radius: 0.8rem;
+	border: 1px solid color-mix(in srgb, var(--color-info) 44%, transparent);
+	background: color-mix(in srgb, var(--color-info-bg) 72%, transparent);
+	font-size: 1.1rem;
+	color: var(--color-info);
+	transition: transform 200ms ease;
+}
+
+.card:hover .cardIcon {
+	transform: rotate(6deg) scale(1.05);
+}
+
+.cardTitle {
+	margin: 0;
+	font-family: var(--font-syne), sans-serif;
+	font-size: 1.35rem;
+	color: color-mix(in srgb, var(--text-main) 94%, transparent);
+}
+
+.cardSubtitle {
+	margin-top: 0.5rem;
+	font-size: 0.92rem;
+	color: color-mix(in srgb, var(--text-main) 76%, transparent);
+}
+
+@media (min-width: 640px) {
+	.metrics {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.cards {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.header {
+		flex-direction: row;
+		align-items: flex-end;
+		justify-content: space-between;
+	}
+}
+
+@media (min-width: 768px) {
+	.metrics {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+}
+
+@media (min-width: 1024px) {
+	.cards {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+}

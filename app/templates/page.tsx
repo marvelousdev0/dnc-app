@@ -1,5 +1,6 @@
 import { DncTable } from '@/components/dnc-table'
 import { getDncRecordsPage } from '@/lib/dnc-data'
+import styles from './page.module.css'
 
 export default async function TemplatesPage({
 	searchParams,
@@ -12,27 +13,30 @@ export default async function TemplatesPage({
 	const data = getDncRecordsPage(page, pageSize)
 
 	return (
-		<main className="page-shell">
-			<header className="topbar">
-				<div>
+		<main className="app-shell">
+			<div className={`bg-orb ${styles.orbLeft}`} />
+			<div className={`bg-orb ${styles.orbRight}`} />
+
+			<div className="content-shell">
+				<header className="page-header reveal">
 					<p className="eyebrow">Template</p>
-					<h1>DNC Template View</h1>
-				</div>
-			</header>
+					<h1 className={styles.title}>DNC Template View</h1>
+				</header>
 
-			<section className="panel">
-				<div className="panel-header">
-					<h2>Paginated mock data</h2>
-				</div>
+				<section className="panel reveal reveal-delay-1">
+					<div className={styles.panelSpacing}>
+						<h2 className={styles.panelTitle}>Paginated mock data</h2>
+					</div>
 
-				<DncTable
-					records={data.items}
-					page={data.currentPage}
-					totalPages={data.totalPages}
-					pageSize={data.pageSize}
-					showActions
-				/>
-			</section>
+					<DncTable
+						records={data.items}
+						page={data.currentPage}
+						totalPages={data.totalPages}
+						pageSize={data.pageSize}
+						showActions
+					/>
+				</section>
+			</div>
 		</main>
 	)
 }

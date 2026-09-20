@@ -1,10 +1,12 @@
+const strict = process.env.STRICT_HEADER !== '0'
+
 module.exports = {
 	extends: ['@commitlint/config-conventional'],
 	plugins: [
 		{
 			rules: {
 				'subject-story-id': (parsed) => {
-					if (process.env.REQUIRE_STORY_ID === '0') {
+					if (process.env.STRICT_HEADER === '0') {
 						return [true]
 					}
 
@@ -35,10 +37,11 @@ module.exports = {
 				'test',
 			],
 		],
-		'scope-empty': [2, 'never'],
+		'type-empty': [strict ? 2 : 0, 'never'],
+		'scope-empty': [strict ? 2 : 0, 'never'],
 		'scope-case': [2, 'always', ['kebab-case', 'lower-case']],
 		'subject-case': [0],
-		'subject-empty': [2, 'never'],
+		'subject-empty': [strict ? 2 : 0, 'never'],
 		'subject-story-id': [2, 'always'],
 		'subject-full-stop': [2, 'never', '.'],
 		'header-max-length': [2, 'always', 100],

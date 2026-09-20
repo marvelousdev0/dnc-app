@@ -2,36 +2,48 @@
 
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
+import { AnchoredMultiSelect, AnchoredSelect } from '@/components/anchored-select'
+import { Button } from '@/components/ui/button'
+import { TextField } from '@/components/ui/text-field'
 import { tracedFetch } from '@/lib/client-trace'
 import {
+	asSelectionArray,
 	BUSINESS_ENTITY,
 	BUSINESS_SEGMENTS,
 	BUSINESS_UNITS,
 	CHANNELS,
 	type DncBusinessUnit,
 	type DncRecord,
+	formatTitleCaseLabel,
 	INTENTS,
 } from '@/lib/dnc-data'
 import type { SessionUser } from '@/lib/session'
+import styles from './dnc-form.module.css'
 
 interface DncFormProps {
 	mode: 'create' | 'edit'
 	record?: DncRecord | null
 }
 
-const defaultRecord: DncRecord = {
+type DncFormState = Omit<DncRecord, 'status'> & {
+	status: DncRecord['status'] | ''
+}
+
+const defaultRecord: DncFormState = {
 	phoneNumber: '',
 	businessEntity: BUSINESS_ENTITY,
-	businessUnit: 'Pharmacy',
-	businessSegment: 'Traditional',
-	channel: 'CALL',
-	intent: 'MARKETING',
+	businessUnit: [],
+	businessSegment: [],
+	channel: [],
+	intent: [],
 	createdDate: new Date().toISOString(),
 	createdBy: '',
 	modifiedDate: new Date().toISOString(),
 	modifiedBy: '',
-	status: 'Active',
+	status: '',
 }
+
+const STATUS_OPTIONS: DncRecord['status'][] = ['Active', 'Pending', 'Revoked']
 
 export function DncForm({ mode, record }: DncFormProps) {
 	const router = useRouter()
@@ -49,30 +61,56 @@ export function DncForm({ mode, record }: DncFormProps) {
 		loadSession()
 	}, [])
 
-	const initialValue = useMemo(
+	const initialValue = useMemo<DncFormState>(
 		() => ({
 			...defaultRecord,
 			...record,
-			businessUnit: record?.businessUnit ?? 'Pharmacy',
-			businessSegment: record?.businessSegment ?? 'Traditional',
-			channel: record?.channel ?? 'CALL',
-			intent: record?.intent ?? 'MARKETING',
+			businessUnit: asSelectionArray(record?.businessUnit, []),
+			businessSegment: asSelectionArray(record?.businessSegment, []),
+			channel: asSelectionArray(record?.channel, []),
+			intent: asSelectionArray(record?.intent, []),
+			status: (record?.status ?? '') as DncFormState['status'],
 			createdBy: record?.createdBy ?? '',
 			modifiedBy: record?.modifiedBy ?? '',
 		}),
 		[record],
 	)
 
-	const [form, setForm] = useState(initialValue)
+	const [form, setForm] = useState<DncFormState>(initialValue)
 	const [error, setError] = useState('')
 	const [message, setMessage] = useState('')
 
-	const businessSegments = BUSINESS_SEGMENTS[form.businessUnit as DncBusinessUnit]
+	const selectedBusinessUnits = asSelectionArray(form.businessUnit, [])
+	const businessSegments = Array.from(
+		new Set(
+			selectedBusinessUnits.flatMap((unit) => BUSINESS_SEGMENTS[unit as DncBusinessUnit] ?? []),
+		),
+	)
+	const selectedBusinessSegments = asSelectionArray(form.businessSegment, []).filter((segment) =>
+		businessSegments.includes(segment),
+	)
+	const isPhoneRequiredMissing = mode === 'create' && form.phoneNumber.trim().length === 0
 
 	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault()
 		setError('')
 		setMessage('')
+
+		const selectedUnits = asSelectionArray(form.businessUnit, [])
+		const selectedSegments = asSelectionArray(form.businessSegment, [])
+		const selectedChannels = asSelectionArray(form.channel, [])
+		const selectedIntents = asSelectionArray(form.intent, [])
+
+		if (
+			isPhoneRequiredMissing ||
+			selectedUnits.length === 0 ||
+			selectedSegments.length === 0 ||
+			selectedChannels.length === 0 ||
+			selectedIntents.length === 0 ||
+			!form.status
+		) {
+			return
+		}
 
 		try {
 			const url =
@@ -84,10 +122,14 @@ export function DncForm({ mode, record }: DncFormProps) {
 				},
 				body: JSON.stringify({
 					...form,
+					businessUnit: selectedUnits,
+					businessSegment: selectedSegments,
+					channel: selectedChannels,
+					intent: selectedIntents,
 					createdBy: mode === 'create' ? sessionUser.id : form.createdBy || sessionUser.id,
 					modifiedBy: sessionUser.id,
 					modifiedDate: new Date().toISOString(),
-					status: form.status || 'Active',
+					status: form.status,
 				}),
 			})
 
@@ -107,143 +149,155 @@ export function DncForm({ mode, record }: DncFormProps) {
 		}
 	}
 
-	const updateField = <K extends keyof DncRecord>(field: K, value: DncRecord[K]) => {
+	const updateField = <K extends keyof DncFormState>(field: K, value: DncFormState[K]) => {
 		setForm((current) => {
-			const next = { ...current, [field]: value } as DncRecord
+			const next = { ...current, [field]: value } as DncFormState
 			if (field === 'businessUnit') {
-				const segmentOptions = BUSINESS_SEGMENTS[value as DncBusinessUnit]
-				if (!segmentOptions.includes(next.businessSegment)) {
-					next.businessSegment = segmentOptions[0]
-				}
+				const units = asSelectionArray(value as DncRecord['businessUnit'], [])
+				const segmentOptions = Array.from(
+					new Set(units.flatMap((unit) => BUSINESS_SEGMENTS[unit as DncBusinessUnit] ?? [])),
+				)
+				const currentSegments = asSelectionArray(next.businessSegment, [])
+				const validSegments = currentSegments.filter((segment) => segmentOptions.includes(segment))
+				next.businessSegment = validSegments
+			}
+
+			if (field === 'businessSegment') {
+				const segments = asSelectionArray(value as DncRecord['businessSegment'], [])
+				next.businessSegment = segments
 			}
 			return next
 		})
 	}
 
 	return (
-		<form className="panel form-panel" onSubmit={handleSubmit}>
-			<div className="field-grid">
-				<label className="field">
-					<span>Phone Number</span>
-					<input
+		<form
+			className={`panel reveal reveal-delay-2 ${styles.form}`}
+			onSubmit={handleSubmit}
+			noValidate
+		>
+			<div className={styles.formHead}>
+				<p className={styles.headLabel}>Record profile</p>
+				<p className={styles.modeChip}>{mode === 'create' ? 'Create mode' : 'Edit mode'}</p>
+			</div>
+
+			<div className={styles.grid}>
+				<div className={styles.label}>
+					<span className={styles.labelText}>
+						Phone Number
+						{mode === 'create' ? <span className={styles.requiredMark}> *</span> : null}
+					</span>
+					<TextField
 						type="tel"
 						value={form.phoneNumber}
 						onChange={(event) => updateField('phoneNumber', event.target.value)}
-						required
 						disabled={mode === 'edit'}
 					/>
-				</label>
+				</div>
 
-				<label className="field">
-					<span>Business Entity</span>
-					<input type="text" value={form.businessEntity} readOnly />
-				</label>
+				<div className={styles.label}>
+					<span className={styles.labelText}>Business Entity</span>
+					<TextField type="text" value={form.businessEntity} readOnly />
+				</div>
 
-				<label className="field">
-					<span>Business Unit</span>
-					<select
-						value={form.businessUnit}
-						onChange={(event) => updateField('businessUnit', event.target.value as DncBusinessUnit)}
-					>
-						{BUSINESS_UNITS.map((unit) => (
-							<option key={unit} value={unit}>
-								{unit}
-							</option>
-						))}
-					</select>
-				</label>
+				<div className={styles.label}>
+					<span className={styles.labelText}>
+						Business Unit<span className={styles.requiredMark}> *</span>
+					</span>
+					<AnchoredMultiSelect
+						values={selectedBusinessUnits}
+						options={BUSINESS_UNITS}
+						ariaLabel="Business Unit"
+						placeholder="Select"
+						onChange={(values) => updateField('businessUnit', values as DncRecord['businessUnit'])}
+					/>
+				</div>
 
-				<label className="field">
-					<span>Business Segment</span>
-					<select
-						value={form.businessSegment}
-						onChange={(event) =>
-							updateField('businessSegment', event.target.value as DncRecord['businessSegment'])
+				<div className={styles.label}>
+					<span className={styles.labelText}>
+						Business Segment<span className={styles.requiredMark}> *</span>
+					</span>
+					<AnchoredMultiSelect
+						values={selectedBusinessSegments}
+						options={businessSegments}
+						ariaLabel="Business Segment"
+						placeholder="Select"
+						onChange={(values) =>
+							updateField('businessSegment', values as DncRecord['businessSegment'])
 						}
-					>
-						{businessSegments.map((segment) => (
-							<option key={segment} value={segment}>
-								{segment}
-							</option>
-						))}
-					</select>
-				</label>
+					/>
+				</div>
 
-				<label className="field">
-					<span>Channel</span>
-					<select
-						value={form.channel}
-						onChange={(event) => updateField('channel', event.target.value as DncRecord['channel'])}
-					>
-						{CHANNELS.map((channel) => (
-							<option key={channel} value={channel}>
-								{channel}
-							</option>
-						))}
-					</select>
-				</label>
+				<div className={styles.label}>
+					<span className={styles.labelText}>
+						Channel<span className={styles.requiredMark}> *</span>
+					</span>
+					<AnchoredMultiSelect
+						values={asSelectionArray(form.channel, [])}
+						options={CHANNELS}
+						ariaLabel="Channel"
+						placeholder="Select"
+						formatOptionLabel={formatTitleCaseLabel}
+						onChange={(values) => updateField('channel', values as DncRecord['channel'])}
+					/>
+				</div>
 
-				<label className="field">
-					<span>Intent</span>
-					<select
-						value={form.intent}
-						onChange={(event) => updateField('intent', event.target.value as DncRecord['intent'])}
-					>
-						{INTENTS.map((intent) => (
-							<option key={intent} value={intent}>
-								{intent}
-							</option>
-						))}
-					</select>
-				</label>
+				<div className={styles.label}>
+					<span className={styles.labelText}>
+						Intent<span className={styles.requiredMark}> *</span>
+					</span>
+					<AnchoredMultiSelect
+						values={asSelectionArray(form.intent, [])}
+						options={INTENTS}
+						ariaLabel="Intent"
+						placeholder="Select"
+						formatOptionLabel={formatTitleCaseLabel}
+						onChange={(values) => updateField('intent', values as DncRecord['intent'])}
+					/>
+				</div>
 
-				<label className="field">
-					<span>Status</span>
-					<select
-						value={form.status}
-						onChange={(event) => updateField('status', event.target.value as DncRecord['status'])}
-					>
-						<option value="Active">Active</option>
-						<option value="Pending">Pending</option>
-						<option value="Revoked">Revoked</option>
-					</select>
-				</label>
+				<div className={styles.label}>
+					<span className={styles.labelText}>
+						Status<span className={styles.requiredMark}> *</span>
+					</span>
+					<AnchoredSelect
+						value={form.status || undefined}
+						options={STATUS_OPTIONS}
+						ariaLabel="Status"
+						placeholder="Select"
+						onChange={(value) => updateField('status', value)}
+					/>
+				</div>
 
-				<label className="field">
-					<span>Created Date</span>
-					<input type="text" value={new Date(form.createdDate).toLocaleString()} readOnly />
-				</label>
+				<div className={styles.label}>
+					<span className={styles.labelText}>Created Date</span>
+					<TextField type="text" value={new Date(form.createdDate).toLocaleString()} readOnly />
+				</div>
 
-				<label className="field">
-					<span>Created By</span>
-					<input type="text" value={form.createdBy || sessionUser.id} readOnly />
-				</label>
+				<div className={styles.label}>
+					<span className={styles.labelText}>Created By</span>
+					<TextField type="text" value={form.createdBy || sessionUser.id} readOnly />
+				</div>
 
-				<label className="field">
-					<span>Modified Date</span>
-					<input type="text" value={new Date(form.modifiedDate).toLocaleString()} readOnly />
-				</label>
+				<div className={styles.label}>
+					<span className={styles.labelText}>Modified Date</span>
+					<TextField type="text" value={new Date(form.modifiedDate).toLocaleString()} readOnly />
+				</div>
 
-				<label className="field">
-					<span>Modified By</span>
-					<input type="text" value={form.modifiedBy || sessionUser.id} readOnly />
-				</label>
+				<div className={styles.label}>
+					<span className={styles.labelText}>Modified By</span>
+					<TextField type="text" value={form.modifiedBy || sessionUser.id} readOnly />
+				</div>
 			</div>
 
-			{error ? <p className="form-message error">{error}</p> : null}
-			{message ? <p className="form-message success">{message}</p> : null}
+			{error ? <p className={styles.error}>{error}</p> : null}
+			{message ? <p className={styles.success}>{message}</p> : null}
 
-			<div className="button-row">
-				<button type="submit" className="button primary">
-					{mode === 'create' ? 'Create DNC Record' : 'Save Changes'}
-				</button>
-				<button
-					type="button"
-					className="button secondary"
-					onClick={() => router.push('/internal-dnc')}
-				>
+			<div className={styles.actions}>
+				<Button type="submit">{mode === 'create' ? 'Create DNC Record' : 'Save Changes'}</Button>
+				<Button type="button" variant="secondary" onClick={() => router.push('/internal-dnc')}>
 					Cancel
-				</button>
+				</Button>
 			</div>
 		</form>
 	)

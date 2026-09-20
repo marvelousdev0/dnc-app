@@ -5,14 +5,15 @@ export type DncBusinessSegment = 'Traditional' | 'Retail' | 'Specialty' | 'HPC C
 export type DncChannel = 'CALL' | 'TEXT'
 export type DncIntent = 'MARKETING' | 'INFORMATIONAL' | 'ALL INTENTS'
 export type DncStatus = 'Active' | 'Revoked' | 'Pending'
+export type DncSelection<T extends string> = T | T[]
 
 export interface DncRecord {
 	phoneNumber: string
 	businessEntity: string
-	businessUnit: DncBusinessUnit
-	businessSegment: DncBusinessSegment
-	channel: DncChannel
-	intent: DncIntent
+	businessUnit: DncSelection<DncBusinessUnit>
+	businessSegment: DncSelection<DncBusinessSegment>
+	channel: DncSelection<DncChannel>
+	intent: DncSelection<DncIntent>
 	createdDate: string
 	createdBy: string
 	modifiedDate: string
@@ -30,14 +31,31 @@ export const BUSINESS_SEGMENTS: Record<DncBusinessUnit, DncBusinessSegment[]> = 
 export const CHANNELS: DncChannel[] = ['CALL', 'TEXT']
 export const INTENTS: DncIntent[] = ['MARKETING', 'INFORMATIONAL', 'ALL INTENTS']
 
+export function formatTitleCaseLabel(value: string): string {
+	return value
+		.toLowerCase()
+		.split(/\s+/)
+		.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+		.join(' ')
+}
+
+export function asSelectionArray<T extends string>(
+	value: DncSelection<T> | undefined,
+	fallback: readonly T[],
+): T[] {
+	const values = Array.isArray(value) ? value : value ? [value] : []
+	const sanitized = values.filter(Boolean)
+	return sanitized.length > 0 ? sanitized : [...fallback]
+}
+
 const mockData: DncRecord[] = [
 	{
 		phoneNumber: '4155550101',
 		businessEntity: BUSINESS_ENTITY,
-		businessUnit: 'Pharmacy',
-		businessSegment: 'Traditional',
-		channel: 'CALL',
-		intent: 'MARKETING',
+		businessUnit: ['Pharmacy', 'PCO'],
+		businessSegment: ['Traditional', 'Specialty'],
+		channel: ['CALL', 'TEXT'],
+		intent: ['MARKETING', 'INFORMATIONAL'],
 		createdDate: '2024-01-12T09:15:00.000Z',
 		createdBy: 'mruiz',
 		modifiedDate: '2024-04-18T11:25:00.000Z',
@@ -74,8 +92,8 @@ const mockData: DncRecord[] = [
 		phoneNumber: '4155550138',
 		businessEntity: BUSINESS_ENTITY,
 		businessUnit: 'Pharmacy',
-		businessSegment: 'Retail',
-		channel: 'TEXT',
+		businessSegment: ['Retail', 'Traditional'],
+		channel: ['TEXT', 'CALL'],
 		intent: 'MARKETING',
 		createdDate: '2024-05-11T07:50:00.000Z',
 		createdBy: 'cford',
@@ -125,10 +143,10 @@ const mockData: DncRecord[] = [
 	{
 		phoneNumber: '4155550171',
 		businessEntity: BUSINESS_ENTITY,
-		businessUnit: 'PCO',
-		businessSegment: 'Specialty',
+		businessUnit: ['PCO', 'HPC'],
+		businessSegment: ['Specialty', 'HPC Care'],
 		channel: 'CALL',
-		intent: 'MARKETING',
+		intent: ['MARKETING', 'ALL INTENTS'],
 		createdDate: '2024-03-02T08:05:00.000Z',
 		createdBy: 'slee',
 		modifiedDate: '2024-03-02T08:05:00.000Z',
@@ -151,9 +169,9 @@ const mockData: DncRecord[] = [
 	{
 		phoneNumber: '4155550199',
 		businessEntity: BUSINESS_ENTITY,
-		businessUnit: 'Pharmacy',
-		businessSegment: 'Retail',
-		channel: 'CALL',
+		businessUnit: ['Pharmacy', 'HPC'],
+		businessSegment: ['Retail', 'HPC Care'],
+		channel: ['CALL', 'TEXT'],
 		intent: 'INFORMATIONAL',
 		createdDate: '2024-01-19T06:42:00.000Z',
 		createdBy: 'lpatel',
@@ -192,8 +210,8 @@ const mockData: DncRecord[] = [
 		businessEntity: BUSINESS_ENTITY,
 		businessUnit: 'HPC',
 		businessSegment: 'HPC Care',
-		channel: 'TEXT',
-		intent: 'MARKETING',
+		channel: ['TEXT', 'CALL'],
+		intent: ['MARKETING', 'INFORMATIONAL'],
 		createdDate: '2023-10-31T07:09:00.000Z',
 		createdBy: 'swhite',
 		modifiedDate: '2024-04-16T18:30:00.000Z',
@@ -255,10 +273,10 @@ const mockData: DncRecord[] = [
 	{
 		phoneNumber: '4155550270',
 		businessEntity: BUSINESS_ENTITY,
-		businessUnit: 'PCO',
-		businessSegment: 'Specialty',
+		businessUnit: ['PCO', 'Pharmacy'],
+		businessSegment: ['Specialty', 'Traditional'],
 		channel: 'TEXT',
-		intent: 'ALL INTENTS',
+		intent: ['ALL INTENTS', 'MARKETING'],
 		createdDate: '2024-02-11T14:21:00.000Z',
 		createdBy: 'crogers',
 		modifiedDate: '2024-03-14T08:17:00.000Z',
@@ -328,10 +346,14 @@ export function createDncRecord(input: Partial<DncRecord>) {
 	const record: DncRecord = {
 		phoneNumber,
 		businessEntity: input.businessEntity ?? BUSINESS_ENTITY,
-		businessUnit: (input.businessUnit as DncBusinessUnit) ?? 'Pharmacy',
-		businessSegment: (input.businessSegment as DncBusinessSegment) ?? 'Traditional',
-		channel: (input.channel as DncChannel) ?? 'CALL',
-		intent: (input.intent as DncIntent) ?? 'MARKETING',
+		businessUnit: asSelectionArray(input.businessUnit as DncSelection<DncBusinessUnit>, [
+			'Pharmacy',
+		]),
+		businessSegment: asSelectionArray(input.businessSegment as DncSelection<DncBusinessSegment>, [
+			'Traditional',
+		]),
+		channel: asSelectionArray(input.channel as DncSelection<DncChannel>, ['CALL']),
+		intent: asSelectionArray(input.intent as DncSelection<DncIntent>, ['MARKETING']),
 		createdDate: input.createdDate ?? timestamp,
 		createdBy: input.createdBy ?? DEFAULT_SESSION_USER.id,
 		modifiedDate: input.modifiedDate ?? timestamp,
@@ -358,11 +380,22 @@ export function updateDncRecord(phoneNumber: string, updates: Partial<DncRecord>
 		...updates,
 		phoneNumber: normalizedPhone,
 		businessEntity: updates.businessEntity ?? mockData[index].businessEntity,
-		businessUnit: (updates.businessUnit as DncBusinessUnit) ?? mockData[index].businessUnit,
-		businessSegment:
-			(updates.businessSegment as DncBusinessSegment) ?? mockData[index].businessSegment,
-		channel: (updates.channel as DncChannel) ?? mockData[index].channel,
-		intent: (updates.intent as DncIntent) ?? mockData[index].intent,
+		businessUnit: asSelectionArray(
+			updates.businessUnit as DncSelection<DncBusinessUnit>,
+			asSelectionArray(mockData[index].businessUnit, ['Pharmacy']),
+		),
+		businessSegment: asSelectionArray(
+			updates.businessSegment as DncSelection<DncBusinessSegment>,
+			asSelectionArray(mockData[index].businessSegment, ['Traditional']),
+		),
+		channel: asSelectionArray(
+			updates.channel as DncSelection<DncChannel>,
+			asSelectionArray(mockData[index].channel, ['CALL']),
+		),
+		intent: asSelectionArray(
+			updates.intent as DncSelection<DncIntent>,
+			asSelectionArray(mockData[index].intent, ['MARKETING']),
+		),
 		status: (updates.status as DncStatus) ?? mockData[index].status,
 		modifiedDate: new Date().toISOString(),
 		modifiedBy: updates.modifiedBy ?? mockData[index].modifiedBy,
@@ -374,6 +407,13 @@ export function updateDncRecord(phoneNumber: string, updates: Partial<DncRecord>
 export function revokeDncRecord(phoneNumber: string, modifiedBy = 'system') {
 	return updateDncRecord(phoneNumber, {
 		status: 'Revoked',
+		modifiedBy,
+	})
+}
+
+export function setDncRecordStatus(phoneNumber: string, status: DncStatus, modifiedBy = 'system') {
+	return updateDncRecord(phoneNumber, {
+		status,
 		modifiedBy,
 	})
 }

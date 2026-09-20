@@ -1,16 +1,19 @@
 import { DncForm } from '@/components/dnc-form'
+import styles from './page.module.css'
 
 export default function NewDncPage() {
 	return (
-		<main className="page-shell narrow-shell">
-			<header className="topbar stacked-header">
-				<div>
-					<p className="eyebrow">Create record</p>
-					<h1>New DNC Entry</h1>
-				</div>
-			</header>
+		<main className="app-shell">
+			<div className={`bg-orb ${styles.orbLeft}`} />
 
-			<DncForm mode="create" />
+			<div className={`content-shell ${styles.contentNarrow}`}>
+				<header className="page-header reveal">
+					<p className="eyebrow">Create record</p>
+					<h1 className={styles.title}>New DNC Entry</h1>
+				</header>
+
+				<DncForm mode="create" />
+			</div>
 		</main>
 	)
 }

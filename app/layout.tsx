@@ -1,26 +1,60 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { DM_Sans, Sora } from 'next/font/google'
+import Script from 'next/script'
+import { AppFooter } from '@/components/app-footer'
+import { AppHeader } from '@/components/app-header'
+import { GlobalLoadingOverlay } from '@/components/global-loading-overlay'
 import './globals.css'
 
-const geistSans = Geist({
-	variable: '--font-geist-sans',
+const dmSans = DM_Sans({
+	variable: '--font-manrope',
 	subsets: ['latin'],
+	display: 'swap',
 })
 
-const geistMono = Geist_Mono({
-	variable: '--font-geist-mono',
+const sora = Sora({
+	variable: '--font-syne',
 	subsets: ['latin'],
+	display: 'swap',
 })
 
 export const metadata: Metadata = {
-	title: 'DNC Control Center',
+	title: 'Admin UI',
 	description: 'Internal dashboard for managing DNC records and view templates',
 }
 
+const themeInitScript = `
+(() => {
+	try {
+		const storageKey = 'theme-preference'
+		const saved = localStorage.getItem(storageKey)
+		const preference = saved === 'light' || saved === 'dark' || saved === 'system' ? saved : 'system'
+		const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+		const resolvedTheme = preference === 'system' ? systemTheme : preference
+		const root = document.documentElement
+		root.dataset.themePreference = preference
+		root.dataset.theme = resolvedTheme
+		root.style.colorScheme = resolvedTheme
+	} catch {
+		// Keep default styling if storage is unavailable.
+	}
+})()
+`
+
 export default function RootLayout({ children }: LayoutProps<'/'>) {
 	return (
-		<html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-			<body>{children}</body>
+		<html lang="en" className={`${dmSans.variable} ${sora.variable}`} suppressHydrationWarning>
+			<head>
+				<Script id="theme-init" strategy="beforeInteractive">
+					{themeInitScript}
+				</Script>
+			</head>
+			<body>
+				<AppHeader />
+				<GlobalLoadingOverlay />
+				{children}
+				<AppFooter />
+			</body>
 		</html>
 	)
 }

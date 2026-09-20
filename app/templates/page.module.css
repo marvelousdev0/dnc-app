@@ -1,0 +1,35 @@
+.orbLeft {
+	left: 5rem;
+	top: 2.5rem;
+	height: 14rem;
+	width: 14rem;
+	background: rgb(103 232 249 / 0.14);
+}
+
+.orbRight {
+	right: 2rem;
+	top: 6rem;
+	height: 14rem;
+	width: 14rem;
+	background: rgb(74 222 128 / 0.16);
+}
+
+.title {
+	margin: 0;
+	font-family: var(--font-syne), sans-serif;
+	font-size: clamp(1.875rem, 4vw, 3rem);
+	line-height: 1.04;
+	letter-spacing: -0.02em;
+	color: color-mix(in srgb, var(--text-main) 96%, transparent);
+}
+
+.panelSpacing {
+	margin-bottom: 1.25rem;
+}
+
+.panelTitle {
+	margin: 0;
+	font-family: var(--font-syne), sans-serif;
+	font-size: 1.75rem;
+	color: color-mix(in srgb, var(--text-main) 94%, transparent);
+}

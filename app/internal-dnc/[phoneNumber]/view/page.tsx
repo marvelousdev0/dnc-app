@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { DncForm } from '@/components/dnc-form'
 import { getDncRecordByPhone } from '@/lib/dnc-data'
+import styles from './page.module.css'
 
 export default async function DncViewPage({
 	params,
@@ -15,15 +16,17 @@ export default async function DncViewPage({
 	}
 
 	return (
-		<main className="page-shell narrow-shell">
-			<header className="topbar stacked-header">
-				<div>
-					<p className="eyebrow">Edit record</p>
-					<h1>{record.phoneNumber}</h1>
-				</div>
-			</header>
+		<main className="app-shell">
+			<div className={`bg-orb ${styles.orbRight}`} />
 
-			<DncForm mode="edit" record={record} />
+			<div className={`content-shell ${styles.contentNarrow}`}>
+				<header className="page-header reveal">
+					<p className="eyebrow">Edit record</p>
+					<h1 className={styles.title}>{record.phoneNumber}</h1>
+				</header>
+
+				<DncForm mode="edit" record={record} />
+			</div>
 		</main>
 	)
 }

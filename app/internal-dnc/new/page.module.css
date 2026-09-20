@@ -1,0 +1,20 @@
+.orbLeft {
+	left: 2.5rem;
+	top: 2.5rem;
+	height: 15rem;
+	width: 15rem;
+	background: rgb(74 222 128 / 0.2);
+}
+
+.contentNarrow {
+	max-width: 64rem;
+}
+
+.title {
+	margin: 0;
+	font-family: var(--font-syne), sans-serif;
+	font-size: clamp(2rem, 4vw, 3rem);
+	line-height: 1.05;
+	letter-spacing: -0.02em;
+	color: color-mix(in srgb, var(--text-main) 96%, transparent);
+}

@@ -1,5 +1,7 @@
 import Link from 'next/link'
+import { ButtonLink } from '@/components/ui/button-link'
 import { getDncRecordsPage } from '@/lib/dnc-data'
+import styles from './page.module.css'
 
 const cards = [
 	{ href: '/internal-dnc', title: 'Internal DNC', subtitle: 'Manage DNC records and statuses' },
@@ -12,41 +14,50 @@ export default async function DashboardPage() {
 	const { totalItems } = getDncRecordsPage(1, 10)
 
 	return (
-		<main className="page-shell">
-			<header className="topbar">
-				<div>
-					<p className="eyebrow">Operations dashboard</p>
-					<h1>Dashboard</h1>
-				</div>
-				<Link href="/internal-dnc" className="button primary">
-					View DNC list
-				</Link>
-			</header>
+		<main className="app-shell">
+			<div className={`bg-orb ${styles.orbLeft}`} />
+			<div className={`bg-orb ${styles.orbRight}`} />
 
-			<section className="stats-grid">
-				<div className="stat-card highlight">
-					<span>Total Records</span>
-					<strong>{totalItems}</strong>
-				</div>
-				<div className="stat-card">
-					<span>Active Rules</span>
-					<strong>24</strong>
-				</div>
-				<div className="stat-card">
-					<span>Revocations</span>
-					<strong>8</strong>
-				</div>
-			</section>
+			<div className="content-shell">
+				<header className={`page-header reveal ${styles.header}`}>
+					<div>
+						<p className="eyebrow">Operations dashboard</p>
+						<h1 className={styles.title}>DNC Command Deck</h1>
+						<p className={styles.subtitle}>
+							Monitor records, update statuses, and route high-risk numbers through a single
+							compliance workspace.
+						</p>
+					</div>
+					<ButtonLink href="/internal-dnc" fullWidth fullWidthSmAuto>
+						View DNC list
+					</ButtonLink>
+				</header>
 
-			<section className="card-grid">
-				{cards.map((card) => (
-					<Link key={card.href} href={card.href} className="page-card">
-						<div className="card-icon">→</div>
-						<h2>{card.title}</h2>
-						<p>{card.subtitle}</p>
-					</Link>
-				))}
-			</section>
+				<section className={`reveal reveal-delay-1 ${styles.metrics}`}>
+					<div className={`panel ${styles.metricHighlight}`}>
+						<p className={styles.metricLabel}>Total records</p>
+						<strong className={styles.metricValue}>{totalItems}</strong>
+					</div>
+					<div className="panel">
+						<p className={styles.metricLabel}>Active rules</p>
+						<strong className={styles.metricValue}>24</strong>
+					</div>
+					<div className="panel">
+						<p className={styles.metricLabel}>Revocations</p>
+						<strong className={styles.metricValue}>8</strong>
+					</div>
+				</section>
+
+				<section className={`reveal reveal-delay-2 ${styles.cards}`}>
+					{cards.map((card) => (
+						<Link key={card.href} href={card.href} className={styles.card}>
+							<div className={styles.cardIcon}>→</div>
+							<h2 className={styles.cardTitle}>{card.title}</h2>
+							<p className={styles.cardSubtitle}>{card.subtitle}</p>
+						</Link>
+					))}
+				</section>
+			</div>
 		</main>
 	)
 }
