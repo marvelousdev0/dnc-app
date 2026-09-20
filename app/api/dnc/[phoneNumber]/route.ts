@@ -1,6 +1,12 @@
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
-import { getDncRecordByPhone, revokeDncRecord, updateDncRecord } from '@/lib/dnc-data'
+import {
+	type DncStatus,
+	getDncRecordByPhone,
+	revokeDncRecord,
+	setDncRecordStatus,
+	updateDncRecord,
+} from '@/lib/dnc-data'
 import { getMockSessionUser } from '@/lib/session'
 import { withApiTelemetry } from '@/lib/telemetry'
 
@@ -51,10 +57,15 @@ export async function PATCH(
 			const { phoneNumber } = await params
 			const sessionUser = getMockSessionUser(request)
 			const body = await request.json()
-			const record = revokeDncRecord(phoneNumber, body.modifiedBy ?? sessionUser.id)
+			const nextStatus = body.status as DncStatus | undefined
+
+			const record =
+				nextStatus && ['Active', 'Pending', 'Revoked'].includes(nextStatus)
+					? setDncRecordStatus(phoneNumber, nextStatus, body.modifiedBy ?? sessionUser.id)
+					: revokeDncRecord(phoneNumber, body.modifiedBy ?? sessionUser.id)
 			return NextResponse.json(record)
 		} catch (error) {
-			const message = error instanceof Error ? error.message : 'Failed to revoke DNC record.'
+			const message = error instanceof Error ? error.message : 'Failed to update DNC record status.'
 			return NextResponse.json({ error: message }, { status: 404 })
 		}
 	})

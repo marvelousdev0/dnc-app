@@ -1,5 +1,6 @@
 import { DncTable } from '@/components/dnc-table'
 import { getDncRecordsPage } from '@/lib/dnc-data'
+import styles from './page.module.css'
 
 export default async function TemplatesPage({
 	searchParams,
@@ -13,22 +14,18 @@ export default async function TemplatesPage({
 
 	return (
 		<main className="app-shell">
-			<div className="bg-orb left-20 top-10 h-56 w-56 bg-cyan-300/14" />
-			<div className="bg-orb right-8 top-24 h-56 w-56 bg-emerald-400/16" />
+			<div className={`bg-orb ${styles.orbLeft}`} />
+			<div className={`bg-orb ${styles.orbRight}`} />
 
 			<div className="content-shell">
-				<header className="reveal mb-7">
+				<header className="page-header reveal">
 					<p className="eyebrow">Template</p>
-					<h1 className="font-[family-name:var(--font-syne)] text-4xl tracking-tight text-slate-50 sm:text-5xl">
-						DNC Template View
-					</h1>
+					<h1 className={styles.title}>DNC Template View</h1>
 				</header>
 
 				<section className="panel reveal reveal-delay-1">
-					<div className="mb-5">
-						<h2 className="font-[family-name:var(--font-syne)] text-2xl text-slate-100">
-							Paginated mock data
-						</h2>
+					<div className={styles.panelSpacing}>
+						<h2 className={styles.panelTitle}>Paginated mock data</h2>
 					</div>
 
 					<DncTable

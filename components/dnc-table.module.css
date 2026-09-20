@@ -1,0 +1,335 @@
+.icon {
+	height: 1rem;
+	width: 1rem;
+}
+
+.container {
+	border-radius: 1rem;
+	border: 1px solid color-mix(in srgb, var(--text-main) 12%, transparent);
+	background: color-mix(in srgb, var(--text-main) 5%, transparent);
+}
+
+.mobileOnly {
+	display: block;
+}
+
+.tabletOnly,
+.desktopOnly {
+	display: none;
+}
+
+.mobileList {
+	margin: 0;
+	padding: 0.75rem;
+	list-style: none;
+	display: grid;
+	gap: 0.75rem;
+}
+
+.mobileCard {
+	border-radius: 0.9rem;
+	border: 1px solid color-mix(in srgb, var(--text-main) 16%, transparent);
+	background: color-mix(in srgb, var(--text-main) 5%, transparent);
+	padding: 0.75rem;
+}
+
+.rowHead {
+	margin-bottom: 0.75rem;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.75rem;
+}
+
+.phone {
+	font-size: 0.92rem;
+	font-weight: 650;
+	color: color-mix(in srgb, var(--text-main) 92%, transparent);
+}
+
+.statusBadge {
+	display: inline-flex;
+	border-radius: 9999px;
+	padding: 0.25rem 0.62rem;
+	font-size: 0.69rem;
+	font-weight: 700;
+}
+
+.statusActive {
+	background: var(--color-success-bg);
+	color: var(--color-success);
+}
+
+.statusPending {
+	background: var(--color-warning-bg);
+	color: var(--color-warning);
+}
+
+.statusRevoked {
+	background: var(--color-danger-bg);
+	color: var(--color-danger);
+}
+
+.detailGrid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0.5rem 0.75rem;
+	font-size: 0.75rem;
+}
+
+.colSpan2 {
+	grid-column: span 2 / span 2;
+}
+
+.metaLabel {
+	color: color-mix(in srgb, var(--text-main) 70%, transparent);
+}
+
+.metaValue {
+	margin-top: 0.1rem;
+	font-weight: 600;
+	color: color-mix(in srgb, var(--text-main) 88%, transparent);
+}
+
+.cellValue {
+	font-size: 0.875rem;
+	color: color-mix(in srgb, var(--text-main) 88%, transparent);
+}
+
+.valueOffset {
+	margin-top: 0.125rem;
+}
+
+.mobileActions {
+	margin-top: 0.75rem;
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0.5rem;
+}
+
+.actionButton,
+.actionLink {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.36rem;
+	border: none;
+	border-radius: 0.55rem;
+	padding: 0.5rem 0.75rem;
+	font-size: 0.72rem;
+	font-weight: 700;
+	text-decoration: none;
+	transition:
+		background 180ms ease,
+		transform 180ms ease;
+}
+
+.actionInfo {
+	background: var(--color-info-bg);
+	color: var(--color-info);
+}
+
+.actionDanger {
+	background: var(--color-danger-bg);
+	color: var(--color-danger);
+}
+
+.actionSuccess {
+	background: var(--color-success-bg);
+	color: var(--color-success);
+}
+
+.actionButton:hover,
+.actionLink:hover {
+	transform: translateY(-1px);
+}
+
+.actionButton:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+	transform: none;
+}
+
+.expandButton {
+	display: inline-flex;
+	height: 1.5rem;
+	width: 1.5rem;
+	align-items: center;
+	justify-content: center;
+	border: none;
+	border-radius: 0.4rem;
+	background: var(--color-info-bg);
+	color: var(--color-info);
+}
+
+.tableWrap {
+	overflow-x: auto;
+}
+
+.table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.tableWide {
+	table-layout: auto;
+}
+
+.tableHeadRow {
+	border-bottom: 1px solid color-mix(in srgb, var(--text-main) 14%, transparent);
+}
+
+.tableHeader,
+.tableCell {
+	padding: 0.75rem;
+	text-align: left;
+}
+
+.tableHeader {
+	font-size: 0.68rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.16em;
+	color: color-mix(in srgb, var(--text-main) 74%, transparent);
+}
+
+.tableCell {
+	font-size: 0.875rem;
+	color: color-mix(in srgb, var(--text-main) 88%, transparent);
+}
+
+.tableRow {
+	border-bottom: 1px solid color-mix(in srgb, var(--text-main) 10%, transparent);
+	transition: background 180ms ease;
+}
+
+.tableRow:hover {
+	background: color-mix(in srgb, var(--color-info-bg) 40%, transparent);
+}
+
+.noBorder {
+	border-bottom: 0;
+}
+
+.expandCell {
+	padding-top: 0.25rem;
+	padding-bottom: 0.75rem;
+}
+
+.detailCard {
+	border-radius: 0.9rem;
+	border: 1px solid color-mix(in srgb, var(--text-main) 14%, transparent);
+	background: color-mix(in srgb, var(--text-main) 5%, transparent);
+	padding: 0.75rem;
+}
+
+.detailCardGrid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 0.75rem;
+	font-size: 0.75rem;
+}
+
+.inlineActions {
+	margin-top: 0.75rem;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.pagination {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	border-top: 1px solid color-mix(in srgb, var(--text-main) 14%, transparent);
+	padding: 1rem 0.75rem 0.75rem;
+	font-size: 0.9rem;
+	color: color-mix(in srgb, var(--text-main) 78%, transparent);
+}
+
+.pageControl {
+	min-width: 6rem;
+	border-radius: 0.55rem;
+	padding: 0.5rem 0.75rem;
+	text-align: center;
+	font-weight: 700;
+	text-decoration: none;
+	transition: background 180ms ease;
+}
+
+.pageControlDisabled {
+	pointer-events: none;
+	background: color-mix(in srgb, var(--text-main) 10%, transparent);
+	color: color-mix(in srgb, var(--text-main) 52%, transparent);
+}
+
+.pageControlActive {
+	background: var(--color-info-bg);
+	color: var(--color-info);
+}
+
+.pageControlActive:hover {
+	background: color-mix(in srgb, var(--color-info-bg) 82%, transparent);
+}
+
+.pageIndicator {
+	text-align: center;
+	font-weight: 700;
+	letter-spacing: 0.03em;
+}
+
+.srOnly {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+@media (min-width: 640px) {
+	.pagination {
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+		padding-inline: 1rem;
+		padding-bottom: 1rem;
+	}
+}
+
+@media (min-width: 768px) {
+	.mobileOnly {
+		display: none;
+	}
+
+	.tabletOnly {
+		display: block;
+	}
+}
+
+@media (min-width: 1024px) {
+	.tabletOnly {
+		display: none;
+	}
+
+	.desktopOnly {
+		display: block;
+	}
+
+	.desktopOnly .tableHeader,
+	.desktopOnly .tableCell {
+		padding: 0.7rem 0.6rem;
+	}
+
+	.desktopOnly .inlineActions {
+		flex-wrap: nowrap;
+	}
+
+	.desktopOnly .actionButton,
+	.desktopOnly .actionLink {
+		white-space: nowrap;
+	}
+}

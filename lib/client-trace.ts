@@ -4,6 +4,9 @@ const TRACEPARENT_HEADER = 'traceparent'
 const TRACE_ID_HEADER = 'x-trace-id'
 const SESSION_ID_HEADER = 'x-session-id'
 const SESSION_STORAGE_KEY = 'dnc_session_id'
+const LOADING_EVENT_NAME = 'dnc:network-loading'
+
+let activeRequests = 0
 
 function toHex(bytes: Uint8Array) {
 	return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('')
@@ -41,6 +44,23 @@ function log(event: string, fields: Record<string, string | number | null | unde
 	)
 }
 
+function emitLoadingEvent(phase: 'start' | 'end', method: string, url: string) {
+	if (typeof window === 'undefined') {
+		return
+	}
+
+	window.dispatchEvent(
+		new CustomEvent(LOADING_EVENT_NAME, {
+			detail: {
+				phase,
+				count: activeRequests,
+				method,
+				url,
+			},
+		}),
+	)
+}
+
 export async function tracedFetch(input: RequestInfo | URL, init: RequestInit = {}) {
 	const traceId = randomHex(16)
 	const spanId = randomHex(8)
@@ -65,20 +85,28 @@ export async function tracedFetch(input: RequestInfo | URL, init: RequestInit = 
 		session_id: sessionId,
 	})
 
-	const response = await fetch(input, {
-		...init,
-		headers,
-	})
+	activeRequests += 1
+	emitLoadingEvent('start', method, url)
 
-	log('ui.response', {
-		method,
-		url,
-		status_code: response.status,
-		duration_ms: Date.now() - startedAtMs,
-		trace_id: traceId,
-		span_id: spanId,
-		session_id: sessionId,
-	})
+	try {
+		const response = await fetch(input, {
+			...init,
+			headers,
+		})
 
-	return response
+		log('ui.response', {
+			method,
+			url,
+			status_code: response.status,
+			duration_ms: Date.now() - startedAtMs,
+			trace_id: traceId,
+			span_id: spanId,
+			session_id: sessionId,
+		})
+
+		return response
+	} finally {
+		activeRequests = Math.max(0, activeRequests - 1)
+		emitLoadingEvent('end', method, url)
+	}
 }
